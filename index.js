@@ -1,6 +1,12 @@
 // ESM
 const { faker } = require('@faker-js/faker');
 const mysql = require('mysql2');
+const express = require("express");
+const app = express();
+
+const path = require("path");
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -11,9 +17,6 @@ const connection = mysql.createConnection({
 //insert new data
 let q = "INSERT INTO user (id ,username,email,password) VALUES ?";
 // let user = ["123", "123@newuser", "abc@gamil.com", "abc"];
-
-
-
 
 
 let getRandomUser = () => {
@@ -30,17 +33,39 @@ let data = [];
 for (let i = 0; i <= 100; i++) {
   data.push(getRandomUser());
 }
+//home route
+app.get("/", (req, res) => {
+  let q = `SELECT count(*) FROM user`;
+  try {
+    connection.query(q, (err, result) => {
+      if (err) throw err;
+      let count = (result[0]["count(*)"])
+      res.render("home.ejs", { count });
+    })
+  } catch (err) {
+    console.log(err);
+    res.send("error in db");
+  }
+})
+// show route
+app.get("/user", (req, res) => {
+  let q = `SELECT * FROM user`;
+
+  connection.query(q, (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.send("error in db");
+    }
+
+    console.log(result);
+    res.send(result);
+  });
+});
 
 
-try {
-  connection.query(q, [data], (err, result) => {
-    if (err) throw err;
-    console.log(result)
-  })
-} catch (err) {
-  console.log(err);
-}
-connection.end();
 
 
-// console.log(getRandomUser());
+//  server should be OUTSIDE all routes
+app.listen(8080, () => {
+  console.log("server is on port 8080");
+});
