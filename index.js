@@ -5,6 +5,7 @@ const express = require("express");
 const app = express();
 
 const path = require("path");
+const { errorMonitor } = require('events');
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -50,19 +51,18 @@ app.get("/", (req, res) => {
 // show route
 app.get("/user", (req, res) => {
   let q = `SELECT * FROM user`;
+  try {
+    connection.query(q, (err, users) => {
+      if (err) throw err;
+      // res.send();
+      res.render("show.ejs", { users });
+    });
+  } catch (err) {
 
-  connection.query(q, (err, result) => {
-    if (err) {
-      console.log(err);
-      return res.send("error in db");
-    }
-
-    console.log(result);
-    res.send(result);
-  });
+    console.error("Unexpected error:", err);
+    res.send("Something went wrong");
+  }
 });
-
-
 
 
 //  server should be OUTSIDE all routes
