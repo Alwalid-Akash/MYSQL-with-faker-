@@ -13,7 +13,10 @@
     "@faker-js/faker": "^10.4.0",
     "ejs": "^5.0.2",
     "express": "^5.2.1",
+    "method": "^2.0.0",
+    "method-override": "^3.0.0",
     "mysql2": "^3.22.3",
+    "override": "^0.0.1",
     "uuid": "^14.0.0"
   }
 }
